@@ -27,7 +27,6 @@ cd youtube-video-summarization
 2. Install dependencies using `uv`:
 
 ```bash
-# Using uv
 uv sync
 ```
 
@@ -55,7 +54,7 @@ from main import YoutubeVideoSumarization, GenerateSummarization, GenerateAudio
 chain = YoutubeVideoSumarization() | GenerateSummarization() | GenerateAudio()
 
 # Process a YouTube video
-result = chain._invoke("https://www.youtube.com/watch?v=VIDEO_ID")
+result = chain.invoke("https://www.youtube.com/watch?v=VIDEO_ID")
 print(result)  # Outputs: "uuid.mp3: A new audio file was saved successfully!"
 ```
 
@@ -67,7 +66,7 @@ print(result)  # Outputs: "uuid.mp3: A new audio file was saved successfully!"
 from main import YoutubeVideoSumarization
 
 transcript_extractor = YoutubeVideoSumarization()
-transcript = transcript_extractor._invoke("https://www.youtube.com/watch?v=VIDEO_ID")
+transcript = transcript_extractor.invoke("https://www.youtube.com/watch?v=VIDEO_ID")
 print(transcript)
 ```
 
@@ -77,7 +76,7 @@ print(transcript)
 from main import GenerateSummarization
 
 summarizer = GenerateSummarization()
-summary = summarizer._invoke(
+summary = summarizer.invoke(
     "Your transcript text here",
     model_name="gpt-4o-mini",  # Optional
     temperature=0.0  # Optional
@@ -91,7 +90,7 @@ print(summary)
 from main import GenerateAudio
 
 audio_generator = GenerateAudio()
-result = audio_generator._invoke(
+result = audio_generator.invoke(
     "Text to convert to speech",
     save_file_path="output.mp3",  # Optional
     voice_id="ZF6FPAbjXT4488VcRRnw"  # Optional

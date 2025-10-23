@@ -26,16 +26,16 @@ class SingletonMetaclass(ABCMeta):
 
 class BaseChain(ABC):
     @abstractmethod
-    def _invoke(self, input: str, **kwargs) -> str:
+    def invoke(self, input: str, **kwargs) -> str:
         pass
 
     def __or__(self, other: BaseChain) -> BaseChain:
         outer_self = self
 
         class ChainedComponent(BaseChain):
-            def _invoke(self_inner, input: str, **kwargs) -> str:
-                intermediate = outer_self._invoke(input, **kwargs)
-                return other._invoke(intermediate, **kwargs)
+            def invoke(self_inner, input: str, **kwargs) -> str:
+                intermediate = outer_self.invoke(input, **kwargs)
+                return other.invoke(intermediate, **kwargs)
 
         return ChainedComponent()
 
@@ -58,7 +58,7 @@ class YoutubeVideoSumarization(BaseChain, metaclass=SingletonMetaclass):
 
         return url
 
-    def _invoke(self, input: str, **kwargs) -> str:
+    def invoke(self, input: str, **kwargs) -> str:
         video_id = YoutubeVideoSumarization.extract_video_id_from_url(url=input)
         transcription = self._ytt_api.fetch(video_id=video_id)
         return " ".join([snippet.text for snippet in transcription.snippets])
@@ -70,7 +70,7 @@ class GenerateSummarization(BaseChain, metaclass=SingletonMetaclass):
     def __init__(self) -> None:
         self._client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    def _invoke(
+    def invoke(
         self,
         input: str,
         *,
@@ -133,7 +133,7 @@ class GenerateAudio(BaseChain, metaclass=SingletonMetaclass):
     def __init__(self) -> None:
         self._client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
-    def _invoke(
+    def invoke(
         self,
         input: str,
         *,
@@ -172,7 +172,7 @@ class GenerateAudio(BaseChain, metaclass=SingletonMetaclass):
 if __name__ == "__main__":
     chain = YoutubeVideoSumarization() | GenerateSummarization() | GenerateAudio()
 
-    result = chain._invoke(
+    result = chain.invoke(
         "https://www.youtube.com/watch?v=uhJJgc-0iTQ&t=41s&pp=ugUEEgJlbtIHCQkHCgGHKiGM7w%3D%3D",
     )
     print(result)
